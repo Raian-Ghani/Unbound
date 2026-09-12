@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kindred — Find people who get you</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="#top" class="logo">Kindred</a>
+    <nav class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#try">Try it</a>
+      <a href="#join">Join</a>
+    </nav>
+    <a href="#join" class="btn btn-small">Get started</a>
+    <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main id="top">
+
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <p class="eyebrow">People, not profiles</p>
+        <h1>Find people<br>who <em>get</em> you.</h1>
+        <p class="hero-sub">Tell us what you're into — your hobbies, your goals, the stuff you'd talk about for hours. We'll find people in your age group who are into it too, and make it easy to say hello.</p>
+        <div class="hero-actions">
+          <a href="#join" class="btn btn-primary">Start matching</a>
+          <a href="#how" class="btn btn-ghost">See how it works</a>
+        </div>
+      </div>
+      <div class="hero-visual" aria-hidden="true">
+        <div class="bubble-stack">
+          <div class="bubble bubble-1">"you're into pottery too??"</div>
+          <div class="bubble bubble-2">let's grab coffee and talk startups</div>
+          <div class="bubble bubble-3">same taste in everything, kind of scary</div>
+          <div class="bubble bubble-4">finally someone who hikes at 6am</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="how" id="how">
+    <div class="section-inner">
+      <h2>Three steps to your next conversation</h2>
+      <ol class="steps">
+        <li class="step">
+          <span class="step-num">01</span>
+          <h3>Tell us who you are</h3>
+          <p>Your age group, your hobbies, what you're chasing right now — big ambitions and small ones both count.</p>
+        </li>
+        <li class="step">
+          <span class="step-num">02</span>
+          <h3>We find your people</h3>
+          <p>We compare what you care about against everyone else who's opted in, and surface the closest matches — not the whole internet.</p>
+        </li>
+        <li class="step">
+          <span class="step-num">03</span>
+          <h3>Say hello</h3>
+          <p>Message right inside Kindred. No hunting down usernames, no cold DMs into the void.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="try" id="try">
+    <div class="section-inner">
+      <h2>Pick a few things you're into</h2>
+      <p class="try-sub">This is just a preview — see how matching feels before you sign up.</p>
+
+      <div class="pill-grid" id="pillGrid">
+        <button class="pill" data-tag="hiking">Hiking</button>
+        <button class="pill" data-tag="startups">Startups</button>
+        <button class="pill" data-tag="cooking">Cooking</button>
+        <button class="pill" data-tag="chess">Chess</button>
+        <button class="pill" data-tag="reading">Reading</button>
+        <button class="pill" data-tag="music">Making music</button>
+        <button class="pill" data-tag="running">Running</button>
+        <button class="pill" data-tag="art">Painting</button>
+        <button class="pill" data-tag="travel">Travel</button>
+        <button class="pill" data-tag="gaming">Gaming</button>
+        <button class="pill" data-tag="volunteering">Volunteering</button>
+        <button class="pill" data-tag="film">Filmmaking</button>
+      </div>
+
+      <div class="preview-results" id="previewResults" aria-live="polite">
+        <p class="preview-empty">Pick at least one interest to see who you'd match with.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="join" id="join">
+    <div class="section-inner join-inner">
+      <div class="join-copy">
+        <h2>Ready to meet your people?</h2>
+        <p>Join the waitlist — we're letting people in in small batches so every match stays worth having.</p>
+      </div>
+
+      <form class="join-form" id="joinForm" novalidate action="{{ url_for('join') }}" method="post">
+        <div class="field">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" required>
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+        <div class="field">
+          <label for="ageGroup">Age group</label>
+          <select id="ageGroup" name="ageGroup" required>
+            <option value="" disabled selected>Choose one</option>
+            <option value="18-24">18–24</option>
+            <option value="25-34">25–34</option>
+            <option value="35-44">35–44</option>
+            <option value="45-54">45–54</option>
+            <option value="55+">55+</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="interests">A few interests</label>
+          <input type="text" id="interests" name="interests" placeholder="hiking, chess, product design">
+        </div>
+        <button type="submit" class="btn btn-primary btn-wide">Join the waitlist</button>
+        <p class="form-note" id="formNote"></p>
+      </form>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="section-inner footer-inner">
+    <span class="logo">Kindred</span>
+    <p>Built for people who'd rather talk to someone than swipe past them.</p>
+  </div>
+</footer>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
