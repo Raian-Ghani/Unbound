@@ -1,31 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kindred — Find people who get you</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
+{% extends "base.html" %}
 
-<header class="nav">
-  <div class="nav-inner">
-    <a href="#top" class="logo">Kindred</a>
-    <nav class="nav-links">
-      <a href="#how">How it works</a>
-      <a href="#try">Try it</a>
-      <a href="#join">Join</a>
-    </nav>
-    <a href="#join" class="btn btn-small">Get started</a>
-    <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
-  </div>
-</header>
-
+{% block content %}
 <main id="top">
 
   <section class="hero">
@@ -75,8 +50,8 @@
 
   <section class="try" id="try">
     <div class="section-inner">
-      <h2>Pick a few things you're into</h2>
-      <p class="try-sub">This is just a preview — see how matching feels before you sign up.</p>
+      <h2>Tell us what you care about</h2>
+      <p class="try-sub">Choose a few interests or add a phrase of your own. We will compare them with real community profiles.</p>
 
       <div class="pill-grid" id="pillGrid">
         <button class="pill" data-tag="hiking">Hiking</button>
@@ -93,9 +68,40 @@
         <button class="pill" data-tag="film">Filmmaking</button>
       </div>
 
+      <form class="interest-form" id="interestForm">
+        <label for="customInterests">Looking for something more specific?</label>
+        <div class="interest-input-row">
+          <input type="text" id="customInterests" placeholder="e.g. documentary photography, climate tech" autocomplete="off">
+          <button type="submit" class="btn btn-ghost">Add interests</button>
+        </div>
+        <p class="field-help">Separate multiple interests with commas. We will use these exact phrases when finding overlaps.</p>
+      </form>
+
       <div class="preview-results" id="previewResults" aria-live="polite">
-        <p class="preview-empty">Pick at least one interest to see who you'd match with.</p>
+        <p class="preview-empty">Choose an interest or add your own to see community matches.</p>
       </div>
+    </div>
+  </section>
+
+  <section class="login" id="login">
+    <div class="section-inner login-inner">
+      <div>
+        <p class="eyebrow">Welcome back</p>
+        <h2>Pick up where you left off.</h2>
+        <p>Log in to see your profile and real matches from the Kindred community.</p>
+      </div>
+      <form class="join-form" id="loginForm" novalidate>
+        <div class="field">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" required>
+        </div>
+        <div class="field">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-wide">Log in</button>
+        <p class="form-note" id="loginNote"></p>
+      </form>
     </div>
   </section>
 
@@ -103,7 +109,7 @@
     <div class="section-inner join-inner">
       <div class="join-copy">
         <h2>Ready to meet your people?</h2>
-        <p>Join the waitlist — we're letting people in in small batches so every match stays worth having.</p>
+        <p>Create your account and tell us what you care about. Your profile and interests are saved securely to your account.</p>
       </div>
 
       <form class="join-form" id="joinForm" novalidate action="{{ url_for('join') }}" method="post">
@@ -114,6 +120,10 @@
         <div class="field">
           <label for="email">Email</label>
           <input type="email" id="email" name="email" required>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" minlength="8" required>
         </div>
         <div class="field">
           <label for="ageGroup">Age group</label>
@@ -130,7 +140,7 @@
           <label for="interests">A few interests</label>
           <input type="text" id="interests" name="interests" placeholder="hiking, chess, product design">
         </div>
-        <button type="submit" class="btn btn-primary btn-wide">Join the waitlist</button>
+        <button type="submit" class="btn btn-primary btn-wide">Create account</button>
         <p class="form-note" id="formNote"></p>
       </form>
     </div>
@@ -138,13 +148,9 @@
 
 </main>
 
-<footer class="site-footer">
-  <div class="section-inner footer-inner">
-    <span class="logo">Kindred</span>
-    <p>Built for people who'd rather talk to someone than swipe past them.</p>
-  </div>
-</footer>
+</main>
+{% endblock %}
 
+{% block scripts %}
 <script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
-</html>
+{% endblock %}

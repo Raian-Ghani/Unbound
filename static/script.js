@@ -1,25 +1,9 @@
-// ===== Mobile nav toggle =====
-const navToggle = document.querySelector('.nav-toggle');
-const navLinks = document.querySelector('.nav-links');
-
-navToggle.addEventListener('click', () => {
-  const open = navLinks.classList.toggle('open');
-  navToggle.setAttribute('aria-expanded', open);
-});
-
 // ===== Live match preview =====
-// Mock "other users" a real backend would supply — used only to demo
-// how compatibility scoring feels before a person signs up.
-const mockProfiles = [
-  { name: 'Amara', tags: ['hiking', 'reading', 'travel', 'volunteering'] },
-  { name: 'Deng',  tags: ['startups', 'chess', 'reading', 'running'] },
-  { name: 'Noor',  tags: ['cooking', 'music', 'art', 'travel'] },
-  { name: 'Priya', tags: ['chess', 'gaming', 'film', 'startups'] },
-  { name: 'Leo',   tags: ['running', 'hiking', 'volunteering', 'cooking'] },
-];
 
 const pillGrid = document.getElementById('pillGrid');
 const previewResults = document.getElementById('previewResults');
+const interestForm = document.getElementById('interestForm');
+const customInterests = document.getElementById('customInterests');
 const selectedTags = new Set();
 
 pillGrid.addEventListener('click', (e) => {
@@ -33,6 +17,17 @@ pillGrid.addEventListener('click', (e) => {
   renderMatches();
 });
 
+interestForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  customInterests.value
+    .split(',')
+    .map((tag) => tag.trim().toLowerCase())
+    .filter(Boolean)
+    .forEach((tag) => selectedTags.add(tag));
+  customInterests.value = '';
+  renderMatches();
+});
+
 function jaccardScore(a, b) {
   const setA = new Set(a);
   const setB = new Set(b);
@@ -43,19 +38,18 @@ function jaccardScore(a, b) {
 
 function renderMatches() {
   if (selectedTags.size === 0) {
-    previewResults.innerHTML = '<p class="preview-empty">Pick at least one interest to see who you\'d match with.</p>';
+    previewResults.innerHTML = '<p class="preview-empty">Choose an interest or add your own to see community matches.</p>';
     return;
   }
 
   const picked = [...selectedTags];
-  const scored = mockProfiles
+  const scored = communityProfiles
     .map((p) => ({ ...p, score: jaccardScore(picked, p.tags) }))
-    .filter((p) => p.score > 0)
     .sort((a, b) => b.score - a.score)
     .slice(0, 3);
 
   if (scored.length === 0) {
-    previewResults.innerHTML = '<p class="preview-empty">No close matches on those yet — try adding another interest.</p>';
+    previewResults.innerHTML = '<p class="preview-empty">There are no other profiles to compare yet. Invite someone who shares your interests.</p>';
     return;
   }
 
@@ -66,15 +60,37 @@ function renderMatches() {
       return `
         <div class="match-card">
           <h4>${p.name}</h4>
-          <div class="match-score">${pct}% compatible</div>
+          <div class="match-score">${pct}% interest overlap</div>
           <div class="match-bar"><div class="match-bar-fill" style="width:${pct}%"></div></div>
-          <div class="match-tags">Shares: ${shared.join(', ')}</div>
+          <div class="match-tags">${shared.length ? `Shares: ${shared.join(', ')}` : 'Closest available profile for now.'}</div>
         </div>`;
     })
     .join('')}</div>`;
 }
 
-// ===== Waitlist form =====
+let communityProfiles = [];
+
+async function loadCommunityProfiles() {
+  const response = await fetch('/api/matches');
+  const data = await response.json();
+  if (!response.ok) return;
+
+  const tagsByProfile = new Map();
+  data.interests.forEach((interest) => {
+    const tags = tagsByProfile.get(interest.profile_id) || [];
+    tags.push(interest.tag);
+    tagsByProfile.set(interest.profile_id, tags);
+  });
+  communityProfiles = data.profiles.map((profile) => ({
+    ...profile,
+    tags: tagsByProfile.get(profile.id) || [],
+  }));
+  if (selectedTags.size > 0) renderMatches();
+}
+
+loadCommunityProfiles();
+
+// ===== Account form =====
 const joinForm = document.getElementById('joinForm');
 const formNote = document.getElementById('formNote');
 
@@ -83,33 +99,66 @@ joinForm.addEventListener('submit', async (e) => {
 
   const name = joinForm.name.value.trim();
   const email = joinForm.email.value.trim();
+  const password = joinForm.password.value;
   const ageGroup = joinForm.ageGroup.value;
   const interests = joinForm.interests.value
     .split(',')
     .map((t) => t.trim().toLowerCase())
     .filter(Boolean);
 
-  if (!name || !email || !ageGroup) {
-    formNote.textContent = 'Fill in your name, email, and age group to join.';
+  if (!name || !email || password.length < 8 || !ageGroup) {
+    formNote.textContent = 'Fill in every field and use a password with at least 8 characters.';
     formNote.className = 'form-note error';
     return;
   }
 
   try {
-    const res = await fetch(joinForm.action, {
+    const res = await fetch('/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, age_group: ageGroup, interests }),
+      body: JSON.stringify({ name, email, password, age_group: ageGroup, interests }),
     });
     const data = await res.json();
 
     if (!res.ok) throw new Error(data.error || 'Something went wrong.');
 
-    formNote.textContent = `You're on the list, ${name}. We'll email you at ${email} when it's your turn.`;
+    if (data.status === 'ok') {
+      window.location.href = '/profile';
+      return;
+    }
+
+    formNote.textContent = data.status === 'check_email'
+      ? `Your account is ready, ${name}. Confirm your email at ${email} to finish signing in.`
+      : `Your account is ready, ${name}.`;
     formNote.className = 'form-note success';
     joinForm.reset();
   } catch (err) {
     formNote.textContent = err.message;
     formNote.className = 'form-note error';
+  }
+});
+
+const loginForm = document.getElementById('loginForm');
+const loginNote = document.getElementById('loginNote');
+
+loginForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  loginNote.textContent = '';
+
+  try {
+    const response = await fetch('/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: document.getElementById('loginEmail').value.trim(),
+        password: document.getElementById('loginPassword').value,
+      }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Could not log in.');
+    window.location.href = '/profile';
+  } catch (error) {
+    loginNote.textContent = error.message;
+    loginNote.className = 'form-note error';
   }
 });

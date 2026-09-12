@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Your profile — Kindred{% endblock %}
+{% block body_class %}profile-page{% endblock %}
+
+{% block content %}
+<main class="profile-main">
+  <section class="profile-shell" aria-labelledby="profileTitle">
+    <p class="eyebrow">Your Kindred profile</p>
+    <h1 id="profileTitle">Loading your profile...</h1>
+    <p class="profile-email" id="profileEmail"></p>
+    <div class="profile-grid" id="profileContent" hidden>
+      <article class="profile-panel">
+        <span class="profile-label">Name</span>
+        <strong id="profileName"></strong>
+        <span class="profile-label">Age group</span>
+        <strong id="profileAge"></strong>
+        <span class="profile-label">Bio</span>
+        <p id="profileBio"></p>
+      </article>
+      <article class="profile-panel">
+        <span class="profile-label">Interests</span>
+        <div class="profile-tags" id="profileInterests"></div>
+      </article>
+    </div>
+    <section class="connection-panel" aria-labelledby="connectionTitle">
+      <div class="connection-heading">
+        <div>
+          <span class="profile-label">Bring your circles together</span>
+          <h2 id="connectionTitle">Find people across your platforms</h2>
+          <p>Connect a public handle to preview how a cross-platform introduction could work. Kindred never contacts the platform from this demo.</p>
+        </div>
+        <span class="simulation-badge">Simulation only</span>
+      </div>
+      <form class="connection-form" id="connectionForm">
+        <div class="field">
+          <label for="platform">Platform</label>
+          <select id="platform" required>
+            <option value="discord">Discord</option>
+            <option value="instagram">Instagram</option>
+            <option value="linkedin">LinkedIn</option>
+            <option value="x">X</option>
+            <option value="reddit">Reddit</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="platformHandle">Public handle</label>
+          <input type="text" id="platformHandle" placeholder="@your-handle" maxlength="120" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Connect handle</button>
+      </form>
+      <p class="form-note" id="connectionNote"></p>
+      <div class="connected-list" id="connectedAccounts"></div>
+      <div class="discovery-panel" id="discoveryPanel" hidden>
+        <div>
+          <span class="profile-label">Preview discovery</span>
+          <h3>People with overlapping interests</h3>
+        </div>
+        <div class="discovery-list" id="discoveryList"></div>
+      </div>
+    </section>
+    <p class="form-note error" id="profileNote"></p>
+    <div class="profile-actions">
+      <a href="{{ url_for('index') }}#try" class="btn btn-primary">See matches</a>
+      <button type="button" class="btn btn-danger" id="deleteAccountButton">Delete account</button>
+    </div>
+  </section>
+</main>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='profile.js') }}"></script>
+{% endblock %}
