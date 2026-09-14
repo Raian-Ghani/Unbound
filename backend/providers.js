@@ -10,8 +10,14 @@ export const providers = {
     async discover() { return demoTargets.map(target => ({ ...target })); }
   },
   linkedin: {
-    name: 'LinkedIn official API adapter',
-    async discover() { throw new Error('LinkedIn discovery requires an approved official API integration.'); }
+    name: 'LinkedIn profile search',
+    async discover({ query = '' } = {}) {
+      const normalizedQuery = query.trim().toLowerCase();
+      return demoTargets
+        .filter(target => target.platform === 'LinkedIn')
+        .filter(target => !normalizedQuery || `${target.name} ${target.role} ${target.company}`.toLowerCase().includes(normalizedQuery))
+        .map(target => ({ ...target }));
+    }
   },
   instagram: {
     name: 'Instagram Graph API adapter',
@@ -19,8 +25,8 @@ export const providers = {
   }
 };
 
-export async function discoverTargets(providerName = 'demo') {
+export async function discoverTargets(providerName = 'demo', options = {}) {
   const provider = providers[providerName];
   if (!provider) throw new Error('Unknown discovery provider.');
-  return provider.discover();
+  return provider.discover(options);
 }

@@ -32,6 +32,9 @@ test('account lifecycle persists data and deletes it', async () => {
   const discovery = await fetch(`${base}/api/discover`, { method: 'POST', headers: { Cookie: cookie, 'Content-Type': 'application/json' }, body: JSON.stringify({ provider: 'demo' }) });
   assert.equal(discovery.status, 200);
   assert.equal((await discovery.json()).targets.length, 3);
+  const linkedinSearch = await fetch(`${base}/api/discover`, { method: 'POST', headers: { Cookie: cookie, 'Content-Type': 'application/json' }, body: JSON.stringify({ provider: 'linkedin', query: 'Northstar' }) });
+  assert.equal(linkedinSearch.status, 200);
+  assert.deepEqual((await linkedinSearch.json()).targets.map(target => target.name), ['Maya Chen']);
   const deletion = await fetch(`${base}/api/account`, { method: 'DELETE', headers: { Cookie: cookie } });
   assert.equal(deletion.status, 200);
   server.close();
